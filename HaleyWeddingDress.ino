@@ -63,15 +63,15 @@ void setup()
   	anims[5].fade(137,165,255, 1);
     
     // top v - front right
-  	anims[6].chase(0,19,255, 100);
+  	anims[6].chase(0,19,255, 20);
     // top v - front left
-  	anims[7].chase(69,50,255, 100);
+  	anims[7].chase(69,50,255, 20);
     //bottom v - front left
-  	anims[8].chase(166,137,255, 25);
+  	anims[8].chase(166,137,255, 10);
     // bottom v - front right
-  	anims[9].chase(70,99,255, 25);
+  	anims[9].chase(70,99,255, 10);
     
-  	anims[10].chase(70,99,255, 25);
+  	anims[10].chase(70,99,255, 10);
     
 }
 
