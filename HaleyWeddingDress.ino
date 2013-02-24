@@ -5,18 +5,16 @@
 #define NUM_LEDS 422
 #define PIN 11
 Animation::CRGB leds[NUM_LEDS];
-
+Animation anims[5] = Animation(leds, NUM_LEDS);
 
 LPD8806Controller<11, 13, 10> LED;
-
 
 String inputString = "";         // a string to hold incoming data
 boolean stringComplete = false;  // whether the string is complete
 int lastInputLed = 0;
 
 // array of animations 
-void (*animations[8])();
-byte animationCount = 0;
+byte animationCount = 5;
 
 Animation animation1(leds, NUM_LEDS);
 Animation animation2(leds, NUM_LEDS);
@@ -36,24 +34,31 @@ void setup()
 	LED.init();
 		
 	pinMode(A0, INPUT);
-  
-  	animation1.fade(0,20,255);  
-  	animation2.fade(369,421,255);
-  	animation3.fade(50,70,255);
-  	animation4.chase(0,20,255);
-  	animation5.chase(69,50,255);
+    anims[0] = animation1;
+    anims[1] = animation2;
+    anims[2] = animation3;
+    anims[3] = animation4;
+    anims[4] = animation5;
+    
+    
+  	anims[0].fade(0,20,255);
+  	anims[1].fade(369,421,255);
+  	anims[2].fade(50,70,255);
+  	anims[3].chase(0,19,255);
+  	anims[4].chase(69,50,255);
+    
 }
 
 void loop()
 {
-	int delayTime = 25;
-	animation1.clear();
-	animation1.play();
-	animation2.play();
-	animation3.play();
-	animation4.play();
-	animation5.play();
-	
+    Serial.println("Hello World");
+    Serial.println(sizeof(leds));
+
+	int delayTime = 50;
+    anims[0].clear();
+    for(int i = 0;i<animationCount;i++)
+        anims[i].play();
+    
 /*	for(int i = 0;i<=20;i++)
 	{
 		leds[i].r = 0;
