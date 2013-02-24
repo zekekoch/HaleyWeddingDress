@@ -178,7 +178,7 @@ class Animation
 			if (direction == 0)
 			{
 				fadeLevel++;
-				if (fadeLevel == 55)
+				if (fadeLevel == 128)
 					direction = 1; 
 			}
 			else if (direction == 1)

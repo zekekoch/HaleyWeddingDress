@@ -1,11 +1,14 @@
 //#include <FastSPI_LED.h>
 #include "FastSPI_LED2.h"
 #include "Animation.h"
+//#include "MemoryFree.h"
 
-#define NUM_LEDS 422
+const int ledCount = 422;
+const int animationCount = 11;
+
 #define PIN 11
-Animation::CRGB leds[NUM_LEDS];
-Animation anims[5] = Animation(leds, NUM_LEDS);
+Animation::CRGB leds[ledCount];
+Animation anims[10] = Animation(leds, ledCount);
 
 LPD8806Controller<11, 13, 10> LED;
 
@@ -13,14 +16,19 @@ String inputString = "";         // a string to hold incoming data
 boolean stringComplete = false;  // whether the string is complete
 int lastInputLed = 0;
 
-// array of animations 
-byte animationCount = 5;
+// array of animations
 
-Animation animation1(leds, NUM_LEDS);
-Animation animation2(leds, NUM_LEDS);
-Animation animation3(leds, NUM_LEDS);
-Animation animation4(leds, NUM_LEDS);
-Animation animation5(leds, NUM_LEDS);
+Animation animation0(leds, ledCount);
+Animation animation1(leds, ledCount);
+Animation animation2(leds, ledCount);
+Animation animation3(leds, ledCount);
+Animation animation4(leds, ledCount);
+Animation animation5(leds, ledCount);
+Animation animation6(leds, ledCount);
+Animation animation7(leds, ledCount);
+Animation animation8(leds, ledCount);
+Animation animation9(leds, ledCount);
+Animation animation10(leds, ledCount);
 
 // top v - center 35, front left 50-70, front right 0-20
 // bottom v - center 70, left 137-165, right 70-99
@@ -32,20 +40,44 @@ void setup()
 {
 	Serial.begin(9600);
 	LED.init();
+    
+//    Serial.print("freeMemory()=");
+ //   Serial.println(freeMemory());
 		
 	pinMode(A0, INPUT);
-    anims[0] = animation1;
-    anims[1] = animation2;
-    anims[2] = animation3;
-    anims[3] = animation4;
-    anims[4] = animation5;
+    anims[0] = animation0;
+    anims[1] = animation1;
+    anims[2] = animation2;
+    anims[3] = animation3;
+    anims[4] = animation4;
+    anims[5] = animation5;
+    anims[6] = animation6;
+    anims[7] = animation7;
+    anims[8] = animation8;
+    anims[9] = animation9;
+    anims[10] = animation10;
     
     
-  	anims[0].fade(0,20,255);
+    // top v
+  	anims[0].fade(0,422,255);
+    // bottom ring
   	anims[1].fade(369,421,255);
-  	anims[2].fade(50,70,255);
-  	anims[3].chase(0,19,255);
-  	anims[4].chase(69,50,255);
+    //
+  	anims[2].fade(50,99,255);
+    anims[3].fade(50,99, 255);
+  	anims[4].fade(281,331,255);
+  	anims[5].fade(369,421,255);
+    
+    // top v - front right
+  	anims[6].chase(0,19,255);
+    // top v - front left
+  	anims[7].chase(69,50,255);
+    //bottom v - front left
+  	anims[8].chase(166,137,255);
+    // bottom v - front right
+  	anims[9].chase(70,99,255);
+    
+  	anims[10].chase(70,99,255);
     
 }
 
@@ -67,7 +99,7 @@ void loop()
 	}
 */
 	
-	LED.showRGB((byte*)leds, NUM_LEDS);
+	LED.showRGB((byte*)leds, ledCount);
 	
 	delay(delayTime);
 }
@@ -152,7 +184,7 @@ int getLedFromSerial() {
     if (Serial.read() == '\n') {
       // constrain the values to 0 - 255 and invert
       // if you're using a common-cathode LED, just use "constrain(color, 0, 255);"
-      iLed = constrain(iLed, 0, NUM_LEDS);
+      iLed = constrain(iLed, 0, ledCount);
       Serial.print("led ");
       Serial.println(iLed);
       
@@ -166,7 +198,7 @@ void colorFromAccelerormeter()
   byte x = analogRead(A0);
 
   clearLeds();
-  for (int i = 0;i < NUM_LEDS;i++)
+  for (int i = 0;i < ledCount;i++)
   {
     if (x > 128)
       leds[i].r = x;
@@ -205,10 +237,10 @@ void setRange(byte color, byte intensity, int first, int last)
 
 
 void progress() {
-  for (int frame = 0;frame < NUM_LEDS;frame++)
+  for (int frame = 0;frame < ledCount;frame++)
   {
     clearLeds();
-    for(int i = frame; i < NUM_LEDS; i++ ) 
+    for(int i = frame; i < ledCount; i++ ) 
     {
       leds[i].r = 255;
       leds[i].g = 0;
