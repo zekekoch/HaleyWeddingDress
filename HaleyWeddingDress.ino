@@ -8,7 +8,20 @@ const int animationCount = 11;
 
 #define PIN 11
 Animation::CRGB leds[ledCount];
-Animation anims[10] = Animation(leds, ledCount);
+Animation anims[11] =
+{
+    Animation(leds, ledCount),
+    Animation(leds, ledCount),
+    Animation(leds, ledCount),
+    Animation(leds, ledCount),
+    Animation(leds, ledCount),
+    Animation(leds, ledCount),
+    Animation(leds, ledCount),
+    Animation(leds, ledCount),
+    Animation(leds, ledCount),
+    Animation(leds, ledCount),
+    Animation(leds, ledCount)
+}; //= Animation(leds, ledCount);
 
 LPD8806Controller<11, 13, 10> LED;
 
@@ -17,18 +30,6 @@ boolean stringComplete = false;  // whether the string is complete
 int lastInputLed = 0;
 
 // array of animations
-
-Animation animation0(leds, ledCount);
-Animation animation1(leds, ledCount);
-Animation animation2(leds, ledCount);
-Animation animation3(leds, ledCount);
-Animation animation4(leds, ledCount);
-Animation animation5(leds, ledCount);
-Animation animation6(leds, ledCount);
-Animation animation7(leds, ledCount);
-Animation animation8(leds, ledCount);
-Animation animation9(leds, ledCount);
-Animation animation10(leds, ledCount);
 
 // top v - center 35, front left 50-70, front right 0-20
 // bottom v - center 70, left 137-165, right 70-99
@@ -41,50 +42,43 @@ void setup()
 	Serial.begin(9600);
 	LED.init();
     
-//    Serial.print("freeMemory()=");
- //   Serial.println(freeMemory());
-		
-	pinMode(A0, INPUT);
-    anims[0] = animation0;
-    anims[1] = animation1;
-    anims[2] = animation2;
-    anims[3] = animation3;
-    anims[4] = animation4;
-    anims[5] = animation5;
-    anims[6] = animation6;
-    anims[7] = animation7;
-    anims[8] = animation8;
-    anims[9] = animation9;
-    anims[10] = animation10;
+    // run the memory test function and print the results to the serial port
+    //int result = memoryTest();
+    //Serial.print("Memory test results: ");
+    //Serial.print(result,DEC);
+    //Serial.print(" bytes free");
+    		
+	pinMode(A0, INPUT);    
     
-    
-    // top v
-  	anims[0].fade(0,422,255);
+    //top ring
+  	anims[2].fade(199,245,255, 1);
+    // middle ring
+  	anims[4].fade(281,331,255, 2);
     // bottom ring
-  	anims[1].fade(369,421,255);
-    //
-  	anims[2].fade(50,99,255);
-    anims[3].fade(50,99, 255);
-  	anims[4].fade(281,331,255);
-  	anims[5].fade(369,421,255);
+  	anims[1].fade(369,421,255, 5);
+
+    // v's are interleaved
+  	anims[0].fade(0,20,255, 1);
+    anims[3].fade(50,99, 255, 1);
+  	anims[5].fade(137,165,255, 1);
     
     // top v - front right
-  	anims[6].chase(0,19,255);
+  	anims[6].chase(0,19,255, 100);
     // top v - front left
-  	anims[7].chase(69,50,255);
+  	anims[7].chase(69,50,255, 100);
     //bottom v - front left
-  	anims[8].chase(166,137,255);
+  	anims[8].chase(166,137,255, 25);
     // bottom v - front right
-  	anims[9].chase(70,99,255);
+  	anims[9].chase(70,99,255, 25);
     
-  	anims[10].chase(70,99,255);
+  	anims[10].chase(70,99,255, 25);
     
 }
 
 void loop()
 {
-    Serial.println("Hello World");
-    Serial.println(sizeof(leds));
+    //Serial.println("Hello World");
+    //Serial.println(sizeof(leds));
 
 	int delayTime = 50;
     anims[0].clear();
@@ -101,7 +95,23 @@ void loop()
 	
 	LED.showRGB((byte*)leds, ledCount);
 	
-	delay(delayTime);
+	// delay(delayTime);
+}
+
+int memoryTest() {
+    int byteCounter = 0; // initialize a counter
+    byte *byteArray; // create a pointer to a byte array
+    // More on pointers here: http://en.wikipedia.org/wiki/Pointer#C_pointers
+    
+    // use the malloc function to repeatedly attempt allocating a certain number of bytes to memory
+    // More on malloc here: http://en.wikipedia.org/wiki/Malloc
+    while ( (byteArray = (byte*) malloc (byteCounter * sizeof(byte))) != NULL ) {
+        byteCounter++; // if allocation was successful, then up the count for the next try
+        free(byteArray); // free memory after allocating it
+    }
+    
+    free(byteArray); // also free memory after the function finishes
+    return byteCounter; // send back the highest number of bytes successfully allocated
 }
 
 /*
