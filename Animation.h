@@ -1,10 +1,10 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
- 
+
 #include <Arduino.h> //It is very important to remember this! note that if you are using Arduino 1.0 IDE, change "WProgram.h" to "Arduino.h"
- 
- 
-class Animation 
+
+
+class Animation
 {
 private:
     int _internalFrame;
@@ -29,12 +29,12 @@ public:
     };
     CRGB* leds;
     int numLeds;
-
+    
     void clear()
     {
         Serial.print("clear ");
         Serial.println(numLeds);
-
+        
         memset(leds, 0, numLeds * sizeof(struct CRGB));
     }
     
@@ -48,19 +48,18 @@ public:
         _animationType = 0;
         getIndex();
         leds = lights;
-        /* nothing for now */
     }
-
+    
     //<<destructor>>
     ~Animation()
     {
         /*nothing to destruct*/
     }
-
+    
     //turn the LED on
     void setup()
     {
-        // nothing 
+        // nothing
     }
     
     void getIndex()
@@ -68,7 +67,7 @@ public:
         static byte index = 0;
         _animationIndex = index++;
     }
-
+    
     //turn the LED off
     void play()
     {
@@ -102,12 +101,12 @@ public:
             case (2):
                 runFade(increment);
                 break;
-        }        
+        }
     }
-		  
+    
     void chase(int start, int end, int color, byte pace)
     {
-    //	Serial.print(getIndex(false));Serial.print(" ");Serial.println("start chase");
+        //	Serial.print(getIndex(false));Serial.print(" ");Serial.println("start chase");
         
         if (start < end)
         {
@@ -126,10 +125,10 @@ public:
         _animationType = 1;
         _pace = pace;
     }
-
+    
     void runChase(bool increment)
     {
-    //	Serial.print(getIndex(false));Serial.print(" ");Serial.println("runChase");
+        //	Serial.print(getIndex(false));Serial.print(" ");Serial.println("runChase");
         
         if (increment)
         {
@@ -138,42 +137,53 @@ public:
                 if (_currentPixel < _endPixel)
                 {
                     _currentPixel++;
-                } 
-                else 
+                }
+                else
                 {
                     _currentPixel = _startPixel;
                 }
-            } 
+            }
             else
             {
                 if (_currentPixel > _startPixel)
                 {
                     _currentPixel--;
-                } 
-                else 
+                }
+                else
                 {
                     _currentPixel = _endPixel;
                 }
             }
         }
-        leds[_currentPixel].r = 55;
+        
+        int iFadePos = _currentPixel;
+        for(int brightness = 255;brightness>1;brightness/=4)
+        {
+            leds[iFadePos].r = brightness;
+            leds[iFadePos].g = 0;
+            leds[iFadePos].b = 0;
+            if (--iFadePos < 1)
+                break;
+        }
+
+        leds[_currentPixel].r = 255;
         leds[_currentPixel].g = 0;
         leds[_currentPixel].b = 0;
         // nothing
-    }	
-
-
+    }
+    
+    
     void solid(int start, int end, int color, byte pace)
     {
-    //	Serial.print(getIndex(false));Serial.print(" ");Serial.println("start solid");
-
+        //	Serial.print(getIndex(false));Serial.print(" ");Serial.println("start solid");
+        
         _startPixel = start;
         _currentPixel = start;
         _endPixel = end;
         _pace = pace;
         _animationType = 0;
     }
-
+    
     void runSolid(bool increment)
     {
         //	Serial.print(getIndex(false));Serial.print(" ");Serial.println("runSolid");
@@ -185,29 +195,29 @@ public:
         }
         
     }
-
+    
     void fade(int start, int end, int color, byte pace)
     {
-    //	Serial.print(getIndex(false));Serial.print(" ");Serial.println("start solid");
-
+        //	Serial.print(getIndex(false));Serial.print(" ");Serial.println("start solid");
+        
         _startPixel = start;
         _currentPixel = start;
         _endPixel = end;
         _animationType = 2;
         _pace = pace;
     }
-
+    
     void runFade(bool increment)
     {
-    //	Serial.print("fade ");Serial.print(fadeLevel);Serial.print(" dir ");Serial.print(direction);Serial.println();
-
+        //	Serial.print("fade ");Serial.print(fadeLevel);Serial.print(" dir ");Serial.print(direction);Serial.println();
+        
         if (increment)
         {
             if (direction == 0)
             {
                 fadeLevel++;
                 if (fadeLevel == 128)
-                    direction = 1; 
+                    direction = 1;
             }
             else if (direction == 1)
             {
@@ -224,7 +234,7 @@ public:
             leds[i].b = fadeLevel;
         }
     }
-				
+    
 };
 
 
