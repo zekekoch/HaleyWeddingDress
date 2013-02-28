@@ -157,13 +157,27 @@ public:
         }
         
         int iFadePos = _currentPixel;
-        for(int brightness = 255;brightness>1;brightness/=4)
+        if (_chaseForward)
         {
-            leds[iFadePos].r = brightness;
-            leds[iFadePos].g = 0;
-            leds[iFadePos].b = 0;
-            if (--iFadePos < 1)
-                break;
+            for(int brightness = 255;brightness>1;brightness/=4)
+            {
+                leds[iFadePos].r = brightness;
+                leds[iFadePos].g = 0;
+                leds[iFadePos].b = 0;
+                if (--iFadePos < 1)
+                    break;
+            }
+        }
+        else
+        {
+            for(int brightness = 255;brightness>1;brightness/=4)
+            {
+                leds[iFadePos].r = brightness;
+                leds[iFadePos].g = 0;
+                leds[iFadePos].b = 0;
+                if (++iFadePos > _endPixel)
+                    break;
+            }
         }
 
         leds[_currentPixel].r = 255;
