@@ -1,6 +1,8 @@
 //#include <FastSPI_LED.h>
 #include "FastSPI_LED2.h"
 #include "Animation.h"
+#include "DressWalker.h"
+
 //#include "MemoryFree.h"
 
 const int ledCount = 422;
@@ -23,6 +25,8 @@ Animation anims[11] =
     Animation(leds, ledCount)
 }; //= Animation(leds, ledCount);
 
+// Setup/define the Led controller with data pin 11, clock pin 13, and latch pin 10
+// this will trigger use of the hardware SPI support on the arduino uno
 LPD8806Controller<11, 13, 10> LED;
 
 String inputString = "";         // a string to hold incoming data
@@ -51,40 +55,56 @@ void setup()
 	pinMode(A0, INPUT);    
     
     //top ring
-  	anims[2].fade(199,245,255, 1);
+  	anims[2].solid(199,245,255, 1);
+    anims[2].setColor(0,0,55);
     // middle ring
-  	anims[4].fade(281,331,255, 2);
+  	anims[4].solid(281,331,255, 2);
+    anims[4].setColor(0,0,55);
     // bottom ring
-  	anims[1].fade(369,421,255, 5);
+  	anims[1].solid(369,421,255, 5);
+    anims[1].setColor(0,0,55);
 
     // v's are interleaved
-  	anims[0].fade(0,20,255, 1);
-    anims[3].fade(50,99, 255, 1);
-  	anims[5].fade(137,165,255, 1);
+  	anims[0].solid(0,20,255, 1);
+    anims[0].setColor(0,0,55);
+    anims[3].solid(50,99, 255, 1);
+    anims[3].setColor(0,0,55);
+  	anims[5].solid(137,165,255, 1);
+    anims[5].setColor(0,0,55);
     
     // top v - front right
-  	anims[6].chase(0,19,255, 200);
+  	anims[6].chase(0,19,255, 40);
+    anims[6].setColor(55,0,0);
     // top v - front left
-  	anims[7].chase(69,50,255, 200);
+  	anims[7].chase(69,50,255, 40);
+    anims[7].setColor(55,0,0);
     //bottom v - front left
-  	anims[8].chase(166,137,255, 100);
+  	anims[8].chase(166,137,255, 20);
+    anims[8].setColor(55,0,0);
     // bottom v - front right
-  	anims[9].chase(70,99,255, 100);
+  	anims[9].chase(70,99,255, 20);
+    anims[9].setColor(55,0,0);
     
-  	anims[10].chase(70,99,255, 100);
+  	anims[10].chase(70,99,255, 20);
+    anims[10].setColor(55,0,0);
     
 }
 
+int xAccel;
 void loop()
 {
     //Serial.println("Hello World");
     //Serial.println(sizeof(leds));
-
+    
+    xAccel = analogRead(14)-655;
+    Serial.print("accel x=");
+    Serial.println(xAccel);
 	int delayTime = 50;
     anims[0].clear();
     for(int i = 0;i<animationCount;i++)
+    {   anims[i].setAccel(xAccel);
         anims[i].play();
-    
+    }
 /*	for(int i = 0;i<=20;i++)
 	{
 		leds[i].r = 0;

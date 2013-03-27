@@ -3,10 +3,25 @@
 
 #include <Arduino.h> //It is very important to remember this! note that if you are using Arduino 1.0 IDE, change "WProgram.h" to "Arduino.h"
 
-
 class Animation
 {
 private:
+    enum AnimationType
+    {
+        SolidAnimation,
+        FadeAnimation,
+        ChaseAnimation
+    };
+    
+    struct Color
+    {
+        byte r;
+        byte g;
+        byte b;
+    };
+    
+    Color color;
+    
     int _internalFrame;
     int _startPixel;
     int _endPixel;
@@ -14,8 +29,9 @@ private:
     byte _pace;
     int _localFrame;
     unsigned long _lastFrame = 0;
-    int _animationType;
+    AnimationType _animationType;
     int _animationIndex;
+    int _accelX;
     bool _chaseForward;
     byte fadeLevel = 0;
     byte direction = 0;
@@ -32,9 +48,6 @@ public:
     
     void clear()
     {
-        Serial.print("clear ");
-        Serial.println(numLeds);
-        
         memset(leds, 0, numLeds * sizeof(struct CRGB));
     }
     
@@ -45,7 +58,7 @@ public:
         _endPixel = 0;
         _currentPixel = 0;
         _localFrame = 0;
-        _animationType = 0;
+        _animationType;
         getIndex();
         leds = lights;
     }
@@ -68,37 +81,49 @@ public:
         _animationIndex = index++;
     }
     
+    void setAccel(int accel)
+    {
+        _accelX = accel;
+    }
+    
+    void setColor(byte r, byte g, byte b)
+    {
+        color.r = r;
+        color.g = g;
+        color.b = b;
+    }
+    
     //turn the LED off
     void play()
     {
         bool increment;
         
-    	Serial.print(_animationIndex);Serial.print(" ");Serial.print("play ");Serial.print(_animationType);
-        Serial.print(" now ");Serial.print(millis());Serial.print(" last ");Serial.print(_lastFrame);
-        Serial.print(" pace ");Serial.print(_pace);
-        Serial.println();
+    	//Serial.print(_animationIndex);Serial.print(" ");Serial.print("play ");Serial.print(_animationType);
+        //Serial.print(" now ");Serial.print(millis());Serial.print(" last ");Serial.print(_lastFrame);
+        //Serial.print(" pace ");Serial.print(_pace);
+        //Serial.println();
         
         if (millis() > _lastFrame + _pace)
         {
             increment = true;
-            Serial.println("Increment");
+            //Serial.println("Increment");
             _lastFrame = millis();
         }
         else
         {
-            Serial.println("Don't Increment");
+            //Serial.println("Don't Increment");
             increment = false;
         }
         
         switch(_animationType)
         {
-            case (0):
+            case (SolidAnimation):
                 runSolid(increment);
                 break;
-            case (1):
+            case (ChaseAnimation):
                 runChase(increment);
                 break;
-            case (2):
+            case (FadeAnimation):
                 runFade(increment);
                 break;
         }
@@ -122,7 +147,7 @@ public:
             _endPixel = start;
             _chaseForward = false;
         }
-        _animationType = 1;
+        _animationType = ChaseAnimation;
         _pace = pace;
     }
     
@@ -157,7 +182,18 @@ public:
         }
         
         int iFadePos = _currentPixel;
-        for(int brightness = 255;brightness>1;brightness/=2)
+        int traceLength;
+        
+        if (_accelX > 64)
+        {
+            traceLength = _accelX/32;
+        }
+        else if (_accelX < -64)
+        {
+            traceLength = -_accelX/32;
+        }
+        
+        for(int brightness = 255;brightness>1;brightness/=traceLength)
         {
             leds[iFadePos].r = brightness;
             leds[iFadePos].g = 0;
@@ -176,9 +212,9 @@ public:
             }
         }
 
-        leds[_currentPixel].r = 255;
-        leds[_currentPixel].g = 0;
-        leds[_currentPixel].b = 0;
+        leds[_currentPixel].r = color.r;
+        leds[_currentPixel].g = color.g;
+        leds[_currentPixel].b = color.b;        
         // nothing
     }
     
@@ -191,7 +227,7 @@ public:
         _currentPixel = start;
         _endPixel = end;
         _pace = pace;
-        _animationType = 0;
+        _animationType = SolidAnimation;
     }
     
     void runSolid(bool increment)
@@ -199,9 +235,9 @@ public:
         //	Serial.print(getIndex(false));Serial.print(" ");Serial.println("runSolid");
         for(int i = _startPixel;i<=_endPixel;i++)
         {
-            leds[i].r = 0;
-            leds[i].g = 0;
-            leds[i].b = 55;
+            leds[i].r = color.r;
+            leds[i].g = color.g;
+            leds[i].b = color.b;
         }
         
     }
@@ -213,7 +249,7 @@ public:
         _startPixel = start;
         _currentPixel = start;
         _endPixel = end;
-        _animationType = 2;
+        _animationType = FadeAnimation;
         _pace = pace;
     }
     
